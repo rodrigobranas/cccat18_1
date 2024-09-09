@@ -1,70 +1,98 @@
 import crypto from "crypto";
 import pgp from "pg-promise";
 import express from "express";
-import { validateCpf } from "./validateCpf";
+import { validateCpf } from "./validateCpf_";
 
-const app = express();
+export const app = express();
 app.use(express.json());
 
 app.post("/signup", async function (req, res) {
-	const input = req.body;
-	const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-	try {
-		const id = crypto.randomUUID();
-		let result;
-		const [acc] = await connection.query("select * from ccca.account where email = $1", [input.email]);
-		if (!acc) {
-
-			if (input.name.match(/[a-zA-Z] [a-zA-Z]+/)) {
-				if (input.email.match(/^(.+)@(.+)$/)) {
-
-					if (validateCpf(input.cpf)) {
-						if (input.isDriver) {
-							if (input.carPlate.match(/[A-Z]{3}[0-9]{4}/)) {
-								await connection.query("insert into ccca.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)", [id, input.name, input.email, input.cpf, input.carPlate, !!input.isPassenger, !!input.isDriver, input.password]);
-								
-								const obj = {
-									accountId: id
-								};
-								result = obj;
-							} else {
-								// invalid car plate
-								result = -5;
-							}
-						} else {
-							await connection.query("insert into ccca.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)", [id, input.name, input.email, input.cpf, input.carPlate, !!input.isPassenger, !!input.isDriver, input.password]);
-
-							const obj = {
-								accountId: id
-							};
-							result = obj;
-						}
-					} else {
-						// invalid cpf
-						result = -1;
-					}
-				} else {
-					// invalid email
-					result = -2;
-				}
-
-			} else {
-				// invalid name
-				result = -3;
-			}
-
-		} else {
-			// already exists
-			result = -4;
-		}
-		if (typeof result === "number") {
-			res.status(422).json({ message: result });
-		} else {
-			res.json(result);
-		}
-	} finally {
-		await connection.$pool.end();
-	}
+  const { body: input } = req;
+  const connection = createConnection();
+  try {
+    const userInDb = await retrieveExistingUser(input, connection);
+    const payloadError = verifyInputsAndReturnErrorIfExists(input, userInDb);
+    if (payloadError) return res.status(422).send({ message: payloadError });
+    const id = crypto.randomUUID();
+    await registerUser(input, id, connection);
+    const result = { accountId: id };
+    res.json(result);
+  } finally {
+    await endConnection(connection);
+  }
 });
+
+const createConnection = () => {
+  return pgp()("postgres://postgres:123456@localhost:5432/app");
+};
+
+const endConnection = async (connection: any) => {
+  return await connection.$pool.end();
+};
+
+const verifyInputsAndReturnErrorIfExists = (input: any, acc: any) => {
+  const ERROR_CODES = {
+    ALREADY_EXISTS: -4,
+    NAME_INVALID: -3,
+    EMAIL_INVALID: -2,
+    CPF_INVALID: -1,
+    PLATE_INVALID: -5,
+  };
+
+  const isNameValid = input.name.match(/[a-zA-Z] [a-zA-Z]+/);
+  const isEmailValid = input.email.match(/^(.+)@(.+)$/);
+  const isPlateValid = input.carPlate.match(/[A-Z]{3}[0-9]{4}/);
+
+  if (acc) return ERROR_CODES.ALREADY_EXISTS;
+
+  if (!isNameValid) return ERROR_CODES.NAME_INVALID;
+
+  if (!isEmailValid) return ERROR_CODES.EMAIL_INVALID;
+
+  if (!validateCpf(input.cpf)) return ERROR_CODES.CPF_INVALID;
+
+  if (!validateCpf(input.cpf)) return ERROR_CODES.CPF_INVALID;
+
+  if (!isPlateValid && input.isDriver) return ERROR_CODES.PLATE_INVALID;
+};
+
+const registerUser = async (input: any, id: string, connection: any) => {
+  if (input.isDriver)
+    return await connection.query(
+      "insert into ccca.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)",
+      [
+        id,
+        input.name,
+        input.email,
+        input.cpf,
+        input.carPlate,
+        !!input.isPassenger,
+        !!input.isDriver,
+        input.password,
+      ]
+    );
+
+  return await connection.query(
+    "insert into ccca.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)",
+    [
+      id,
+      input.name,
+      input.email,
+      input.cpf,
+      input.carPlate,
+      !!input.isPassenger,
+      !!input.isDriver,
+      input.password,
+    ]
+  );
+};
+
+const retrieveExistingUser = async (input: any, connection: any) => {
+  const [acc] = await connection.query(
+    "select * from ccca.account where email = $1",
+    [input.email]
+  );
+  return acc;
+};
 
 app.listen(3000);
