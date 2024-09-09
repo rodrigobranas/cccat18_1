@@ -1,7 +1,7 @@
 import crypto from "crypto";
 import pgp from "pg-promise";
 import express from "express";
-import { validateCpf } from "./validateCpf_";
+import { validateCpf } from "./validateCpf";
 
 export const app = express();
 app.use(express.json());
