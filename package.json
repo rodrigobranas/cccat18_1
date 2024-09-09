@@ -6,7 +6,8 @@
   "scripts": {
     "docker:start": "docker compose up -d",
     "docker:stop": "docker compose stop",
-    "docker:clean": "docker compose rm -fsv"
+    "docker:clean": "docker compose rm -fsv",
+    "test": "jest"
   },
   "dependencies": {
     "@types/express": "^4.17.17",

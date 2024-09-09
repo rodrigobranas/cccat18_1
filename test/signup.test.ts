@@ -33,7 +33,6 @@ describe("POST /signup", () => {
     //@ts-ignore
     mockDb.query.mockResolvedValueOnce([]);
     const response = await request(app).post("/signup").send(input);
-    console.log(response.status);
     expect(response.body).toHaveProperty("accountId");
     expect(mockDb.query).toHaveBeenCalledWith(
       expect.any(String),
