@@ -2,8 +2,6 @@ import request from "supertest";
 import { jest } from "@jest/globals";
 import { app } from "../src/signup";
 
-jest.mock("pg-promise");
-
 const mockDb = {
   query: jest.fn(),
   $pool: {
