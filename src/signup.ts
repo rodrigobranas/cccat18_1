@@ -1,70 +1,25 @@
 import crypto from "crypto";
-import pgp from "pg-promise";
-import express from "express";
 import { validateCpf } from "./validateCpf";
+import AccountDAO from "./AccountDAO";
+import MailerGateway from "./MailerGateway";
 
-const app = express();
-app.use(express.json());
+export default class Signup {
 
-app.post("/signup", async function (req, res) {
-	const input = req.body;
-	const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
-	try {
-		const id = crypto.randomUUID();
-		let result;
-		const [acc] = await connection.query("select * from ccca.account where email = $1", [input.email]);
-		if (!acc) {
-
-			if (input.name.match(/[a-zA-Z] [a-zA-Z]+/)) {
-				if (input.email.match(/^(.+)@(.+)$/)) {
-
-					if (validateCpf(input.cpf)) {
-						if (input.isDriver) {
-							if (input.carPlate.match(/[A-Z]{3}[0-9]{4}/)) {
-								await connection.query("insert into ccca.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)", [id, input.name, input.email, input.cpf, input.carPlate, !!input.isPassenger, !!input.isDriver, input.password]);
-								
-								const obj = {
-									accountId: id
-								};
-								result = obj;
-							} else {
-								// invalid car plate
-								result = -5;
-							}
-						} else {
-							await connection.query("insert into ccca.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)", [id, input.name, input.email, input.cpf, input.carPlate, !!input.isPassenger, !!input.isDriver, input.password]);
-
-							const obj = {
-								accountId: id
-							};
-							result = obj;
-						}
-					} else {
-						// invalid cpf
-						result = -1;
-					}
-				} else {
-					// invalid email
-					result = -2;
-				}
-
-			} else {
-				// invalid name
-				result = -3;
-			}
-
-		} else {
-			// already exists
-			result = -4;
-		}
-		if (typeof result === "number") {
-			res.status(422).json({ message: result });
-		} else {
-			res.json(result);
-		}
-	} finally {
-		await connection.$pool.end();
+	constructor (readonly accountDAO: AccountDAO, readonly mailerGateway: MailerGateway) {
 	}
-});
 
-app.listen(3000);
+	async execute (input: any) {
+		input.accountId = crypto.randomUUID();
+		const accountData = await this.accountDAO.getAccountByEmail(input.email);
+		if (accountData) throw new Error("Duplicated account");
+		if (!input.name.match(/[a-zA-Z] [a-zA-Z]+/)) throw new Error("Invalid name");
+		if (!input.email.match(/^(.+)@(.+)$/)) throw new Error("Invalid email");
+		if (!validateCpf(input.cpf)) throw new Error("Invalid cpf")
+		if (input.isDriver && !input.carPlate.match(/[A-Z]{3}[0-9]{4}/)) throw new Error("Invalid car plate");
+		await this.accountDAO.saveAccount(input);
+		await this.mailerGateway.send(input.email, "Welcome!", "...");
+		return {
+			accountId: input.accountId
+		};
+	}
+}
