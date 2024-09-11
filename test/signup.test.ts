@@ -34,7 +34,7 @@ describe('POST em /signup', () => {
       .send({
         "name": "Vinicius Delboni",
         "email": "vinicius.delboni@gmail.com",
-        "cpf": "10704741776",
+        "cpf": "107.047.417-76",
         "car_plate": "BKL1660",
         "is_passenger": true,
         "is_driver": false,
@@ -49,7 +49,7 @@ describe('POST em /signup', () => {
       .send({
         "name": "Vinicius Delboni",
         "email": "vinicius.delboni@gmail.com",
-        "cpf": "10704741776",
+        "cpf": "107.047.417-76",
         "car_plate": "BKL1660",
         "is_passenger": true,
         "is_driver": false,
@@ -65,7 +65,7 @@ describe('POST em /signup', () => {
       .send({
         "name": "Vinicius Delboni",
         "email": "vini.motorista@gmail.com",
-        "cpf": "10704741776",
+        "cpf": "107.047.417-76",
         "car_plate": "BKL1660",
         "is_passenger": false,
         "is_driver": true,
@@ -80,7 +80,7 @@ describe('POST em /signup', () => {
       .send({
         "name": "Vinicius Delboni",
         "email": "vini.motorista@gmail.com",
-        "cpf": "10704741776",
+        "cpf": "107.047.417-76",
         "car_plate": "BKL1660",
         "is_passenger": false,
         "is_driver": true,
@@ -97,7 +97,7 @@ describe('POST em /signup', () => {
       .send({
         "name": "Vinicius",
         "email": "vini1.motorista@gmail.com",
-        "cpf": "10704741776",
+        "cpf": "107.047.417-76",
         "car_plate": "BKL1600",
         "is_passenger": false,
         "is_driver": true,
@@ -114,7 +114,7 @@ describe('POST em /signup', () => {
       .send({
         "name": "Vinicius D",
         "email": "vini1.motoristagmail.com",
-        "cpf": "10704741776",
+        "cpf": "107.047.417-76",
         "car_plate": "BKL1600",
         "is_passenger": false,
         "is_driver": true,

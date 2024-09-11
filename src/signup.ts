@@ -7,6 +7,20 @@ const app = express();
 app.use(express.json());
 let error = 'Email já cadastrado';
 
+app.get("/users/:id", async function (req, res) {
+	const connection = pgp()("postgres://postgres:123456@localhost:5433/app");
+	const id = req.params.id as string;
+	
+	try {
+		const [acc] = await connection.query("select * from ccca.account where account_id = $1", [id]);
+		if (!acc) return res.status(422).json({ message: "User Not Found" });
+		res.json(acc);
+	} finally {
+		await connection.$pool.end();
+	}
+
+});
+
 app.post("/signup", async function (req, res) {
 	const connection = pgp()("postgres://postgres:123456@localhost:5433/app");
 	try {
@@ -17,7 +31,7 @@ app.post("/signup", async function (req, res) {
 		} else {
 			const id = crypto.randomUUID();
 			const input = req.body;
-			await connection.query("insert into ccca.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)", [id, input.name, input.email, input.cpf, input.carPlate, !!input.isPassenger, !!input.isDriver, input.password]);
+			await connection.query("insert into ccca.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)", [id, input.name, input.email, input.cpf, input.car_plate, !!input.is_passenger, !!input.is_driver, input.password]);
 			const obj = {
 				accountId: id
 			};
