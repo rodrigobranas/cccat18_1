@@ -1,70 +1,69 @@
 import crypto from "crypto";
 import pgp from "pg-promise";
-import express from "express";
+import express, { Request } from "express";
 import { validateCpf } from "./validateCpf";
 
 const app = express();
 app.use(express.json());
+let error = 'Email já cadastrado';
 
 app.post("/signup", async function (req, res) {
-	const input = req.body;
-	const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
+	const connection = pgp()("postgres://postgres:123456@localhost:5433/app");
 	try {
-		const id = crypto.randomUUID();
-		let result;
-		const [acc] = await connection.query("select * from ccca.account where email = $1", [input.email]);
-		if (!acc) {
-
-			if (input.name.match(/[a-zA-Z] [a-zA-Z]+/)) {
-				if (input.email.match(/^(.+)@(.+)$/)) {
-
-					if (validateCpf(input.cpf)) {
-						if (input.isDriver) {
-							if (input.carPlate.match(/[A-Z]{3}[0-9]{4}/)) {
-								await connection.query("insert into ccca.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)", [id, input.name, input.email, input.cpf, input.carPlate, !!input.isPassenger, !!input.isDriver, input.password]);
-								
-								const obj = {
-									accountId: id
-								};
-								result = obj;
-							} else {
-								// invalid car plate
-								result = -5;
-							}
-						} else {
-							await connection.query("insert into ccca.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)", [id, input.name, input.email, input.cpf, input.carPlate, !!input.isPassenger, !!input.isDriver, input.password]);
-
-							const obj = {
-								accountId: id
-							};
-							result = obj;
-						}
-					} else {
-						// invalid cpf
-						result = -1;
-					}
-				} else {
-					// invalid email
-					result = -2;
-				}
-
-			} else {
-				// invalid name
-				result = -3;
-			}
-
+		const [acc] = await connection.query("select * from ccca.account where email = $1", [req.body.email]);
+		
+		if (acc || !validateData(req)) {
+			return res.status(422).json({ message: error });
 		} else {
-			// already exists
-			result = -4;
-		}
-		if (typeof result === "number") {
-			res.status(422).json({ message: result });
-		} else {
-			res.json(result);
+			const id = crypto.randomUUID();
+			const input = req.body;
+			await connection.query("insert into ccca.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver, password) values ($1, $2, $3, $4, $5, $6, $7, $8)", [id, input.name, input.email, input.cpf, input.carPlate, !!input.isPassenger, !!input.isDriver, input.password]);
+			const obj = {
+				accountId: id
+			};
+			res.json(obj);
 		}
 	} finally {
 		await connection.$pool.end();
 	}
 });
 
-app.listen(3000);
+function validateData(data: Request ): boolean {
+	if (!validateName(data.body.name)) {
+		error = 'Nome Inválido';
+		return false;
+	}
+	if (!validateEmail(data.body.email)) {
+		error = 'Email Inválido';
+		return false;
+	}
+	if (!validateCpf(data.body.cpf)) { 
+		error = 'CPF Inválido';
+		return false;
+	}
+	if (!validatePlate(data.body.car_plate)) {
+		error = 'Placa Inválida';
+		return false;
+	}
+	return true;
+}
+
+function validateName(name: string) {
+	const result = name.match(/[a-zA-Z] [a-zA-Z]+/);
+	return !!result;
+}
+function validateEmail(email: string){
+	return !!email.match(/^(.+)@(.+)$/);
+}
+function validatePlate(carPlate: string){
+	return !!carPlate.match(/[A-Z]{3}[0-9]{4}/);
+}
+
+
+if (require.main === module) {
+	app.listen(3000, () => {
+		console.log('Servidor rodando na porta 3000');
+	});
+}
+
+export default app;
