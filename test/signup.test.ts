@@ -135,7 +135,7 @@ test("Deve criar a conta de um passageiro com spy", async function () {
 	mailerSpy.restore();
 });
 
-test.only("Deve criar a conta de um passageiro com mock", async function () {
+test("Deve criar a conta de um passageiro com mock", async function () {
 	const mailerMock = sinon.mock(MailerGatewayMemory.prototype);
 	const input = {
 		name: "John Doe",
