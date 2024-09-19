@@ -8,7 +8,7 @@ app.use(express.json());
 
 app.post("/signup", async function (req, res) {
 	const input = req.body;
-	const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
+	const connection = pgp()("postgres://postgres:123456@localhost:5433/app");
 	try {
 		const id = crypto.randomUUID();
 		let result;
@@ -66,5 +66,13 @@ app.post("/signup", async function (req, res) {
 		await connection.$pool.end();
 	}
 });
+
+app.get("/accounts/:accountId", async function (req, res){
+	const connection = pgp()("postgres://postgres:123456@localhost:5433/app");
+	const [accountData] = await connection.query("select * from ccca.account where account_id = $1", [req.params.accountId]);
+	await connection.$pool.end();
+	res.json(accountData);
+});
+
 
 app.listen(3000);
