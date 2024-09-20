@@ -1,5 +1,17 @@
 
-import { getAccount, signup } from "../src/signup";
+import { AccountDAODatabase, AccountDAOMemory } from "../src/AccountDAO";
+import GetAccount from "../src/GetAccount";
+import SignUp from "../src/Signup";
+
+let signup: SignUp;
+let getAccount: GetAccount;
+
+beforeEach(() => {
+  // const accountDAO = new AccountDAODatabase();
+  const accountDAO = new AccountDAOMemory();
+  signup = new SignUp(accountDAO);
+  getAccount = new GetAccount(accountDAO);
+});
 
 test ("Deve criar a conta de um passageiro", async function () {
   const input = {
@@ -9,15 +21,14 @@ test ("Deve criar a conta de um passageiro", async function () {
     password: "123456",
     isPassenger: true
   };
-  const outputSignup = await signup(input);
+  const outputSignup = await signup.execute(input);
   expect(outputSignup.accountId).toBeDefined();
-  const outputGetAccount = await getAccount(outputSignup.accountId);
-  
+  const outputGetAccount = await getAccount.execute(outputSignup.accountId);
   expect(outputGetAccount.name).toBe(input.name);
   expect(outputGetAccount.email).toBe(input.email);
   expect(outputGetAccount.cpf).toBe(input.cpf);
   expect(outputGetAccount.password).toBe(input.password);
-  expect(outputGetAccount.is_passenger).toBe(input.isPassenger);
+  expect(outputGetAccount.isPassenger).toBe(input.isPassenger);
 });
 
 test ("Não deve criar a conta de um passageiro com nome inválido", async function () {
@@ -33,7 +44,7 @@ test ("Não deve criar a conta de um passageiro com nome inválido", async funct
     colocamos como uma função a execução do signup, assim javascript entende que a execução ocorrerá
     dentro de um try/catch por conta do toThrow
   */
-  await expect(() => signup(input)).rejects.toThrow(new Error("Invalid name"));
+  await expect(() => signup.execute(input)).rejects.toThrow(new Error("Invalid name"));
 });
 
 test ("Não deve criar a conta de um passageiro com email inválido", async function () {
@@ -44,7 +55,7 @@ test ("Não deve criar a conta de um passageiro com email inválido", async func
     password: "123456",
     isPassenger: true
   };
-  await expect(() => signup(input)).rejects.toThrow(new Error("Invalid email"));
+  await expect(() => signup.execute(input)).rejects.toThrow(new Error("Invalid email"));
 });
 
 test ("Não deve criar a conta de um passageiro com cpf inválido", async function () {
@@ -55,7 +66,7 @@ test ("Não deve criar a conta de um passageiro com cpf inválido", async functi
     password: "123456",
     isPassenger: true
   };
-  await expect(() => signup(input)).rejects.toThrow(new Error("Invalid CPF"));
+  await expect(() => signup.execute(input)).rejects.toThrow(new Error("Invalid CPF"));
 });
 
 test ("Não deve criar a conta de um passageiro duplicado", async function () {
@@ -66,8 +77,8 @@ test ("Não deve criar a conta de um passageiro duplicado", async function () {
     password: "123456",
     isPassenger: true
   };
-  await signup(input);
-  await expect(() => signup(input)).rejects.toThrow(new Error("Duplicated account"));
+  await signup.execute(input);
+  await expect(() => signup.execute(input)).rejects.toThrow(new Error("Duplicated account"));
 });
 
 test ("Não deve criar a conta de um motorista com placa inválida", async function () {
@@ -79,5 +90,5 @@ test ("Não deve criar a conta de um motorista com placa inválida", async funct
     carPlate: "AAA999",
     isDriver: true
   };
-  await expect(() => signup(input)).rejects.toThrow(new Error("Invalid Car Plate"));
+  await expect(() => signup.execute(input)).rejects.toThrow(new Error("Invalid Car Plate"));
 });
