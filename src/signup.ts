@@ -1,8 +1,8 @@
 import crypto from "crypto";
-import AccountDAO from "./AccountDAO";
 import { validateCpf } from "./validateCpf";
+import { AccountDAODatabase } from "./AccountDAO";
 
-const accountDAO = new AccountDAO();
+const accountDAO = new AccountDAODatabase();
 
 export async function signup(input: any){
   input.id = crypto.randomUUID();
