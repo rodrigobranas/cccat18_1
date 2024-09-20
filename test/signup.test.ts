@@ -1,4 +1,3 @@
-
 import { AccountDAODatabase, AccountDAOMemory } from "../src/AccountDAO";
 import GetAccount from "../src/GetAccount";
 import SignUp from "../src/Signup";
