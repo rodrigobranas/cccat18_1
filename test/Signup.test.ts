@@ -1,4 +1,4 @@
-import { AccountDAODatabase, AccountDAOMemory } from "../src/AccountDAO";
+import { AccountRepositoryDatabase, AccountRepositoryMemory } from "../src/AccountRepository";
 import GetAccount from "../src/GetAccount";
 import SignUp from "../src/Signup";
 
@@ -6,10 +6,10 @@ let signup: SignUp;
 let getAccount: GetAccount;
 
 beforeEach(() => {
-  // const accountDAO = new AccountDAODatabase();
-  const accountDAO = new AccountDAOMemory();
-  signup = new SignUp(accountDAO);
-  getAccount = new GetAccount(accountDAO);
+  const accountRepository = new AccountRepositoryDatabase();
+  //const accountRepository = new AccountRepositoryMemory();
+  signup = new SignUp(accountRepository);
+  getAccount = new GetAccount(accountRepository);
 });
 
 test ("Deve criar a conta de um passageiro", async function () {

@@ -1,6 +1,6 @@
 import express from "express";
 import Signup from "./Signup";
-import { AccountDAODatabase } from "./AccountDAO";
+import { AccountRepositoryDatabase } from "./AccountRepository";
 import GetAccount from "./GetAccount";
 
 
@@ -10,8 +10,8 @@ app.use(express.json());
 app.post("/signup", async function (req, res) {
   const input = req.body;
   try {
-    const accountDAO = new AccountDAODatabase();
-    const signup = new Signup(accountDAO);
+    const accountRepository = new AccountRepositoryDatabase();
+    const signup = new Signup(accountRepository);
     const output = await signup.execute(input);
     res.json(output);
   } catch (e: any) {
@@ -20,8 +20,8 @@ app.post("/signup", async function (req, res) {
 });
 
 app.get("/accounts/:accountId", async function (req, res){
-  const accoutDAO = new AccountDAODatabase();
-  const getAccount = new GetAccount(accoutDAO);
+  const accountRepository = new AccountRepositoryDatabase();
+  const getAccount = new GetAccount(accountRepository);
   const output = await getAccount.execute(req.params.accountId);
   res.json(output);
 });
