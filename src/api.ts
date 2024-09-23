@@ -2,16 +2,22 @@ import express from "express";
 import Signup from "./Signup";
 import { AccountRepositoryDatabase } from "./AccountRepository";
 import GetAccount from "./GetAccount";
+import { Registry } from "./DI";
 
 
 const app = express();
 app.use(express.json());
 
+const accountRepository = new AccountRepositoryDatabase();
+
+Registry.getInstance().provide("accountRepository", accountRepository);
+
+
 app.post("/signup", async function (req, res) {
   const input = req.body;
   try {
-    const accountRepository = new AccountRepositoryDatabase();
-    const signup = new Signup(accountRepository);
+    
+    const signup = new Signup();
     const output = await signup.execute(input);
     res.json(output);
   } catch (e: any) {
