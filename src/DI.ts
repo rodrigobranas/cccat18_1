@@ -25,3 +25,21 @@ export class Registry {
     return Registry.instance;
   }
 }
+
+// typescript Decorator
+export function inject (name: string) {
+  /*
+  * target: objeto em si.
+  * propertyKey propriedade onde aplica o decorator
+  * implementado em Signup.ts 
+   */
+  return function(target: any, propertyKey: string){
+    // Cria um objeto, permitindo acessar as propriedades do Objeto, podendo fazer coisas nesse meio tempo, entre acessar e retornar
+    target[propertyKey] = new Proxy({}, {
+      get (target: any, propertyKey: string){
+        const dependecy = Registry.getInstance().inject(name);
+        return dependecy[propertyKey];
+      }
+    })
+  }
+}

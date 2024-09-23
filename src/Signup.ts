@@ -1,14 +1,11 @@
 import Account from "./Account";
 import AccountRepository from "./AccountRepository";
-import { Registry } from "./DI";
+import { inject, Registry } from "./DI";
 
 export default class Signup {
-  //@inject("accountRepository")
+  @inject("accountRepository")
   accountRepository?: AccountRepository;
 
-  constructor (){
-    this.accountRepository = Registry.getInstance().inject("accountRepository");
-  }
   // Dependency Inversion Principle - Dependency Injection
   async execute(input: any){
     
