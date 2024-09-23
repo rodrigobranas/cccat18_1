@@ -1,15 +1,18 @@
 import AccountRepository from "./AccountRepository";
+import { inject } from "./DI";
 
 /*
 * export default: diz para que exportat tudo, e não somente por quem deseja.
 */
 export default class GetAccount {
   
-  constructor (readonly accountRepository: AccountRepository) {
-  }
+  @inject("accountRepository")
+  accountRepository?: AccountRepository;
+
 
   async execute(accountId: string){
-    const account = await this.accountRepository.getAccountById(accountId);
+    const account = await this.accountRepository?.getAccountById(accountId);
+    if (!account) throw new Error("Account not found")
     // DTO - Data Transfer Object
     return {
       accountId: account.getAccountId(),

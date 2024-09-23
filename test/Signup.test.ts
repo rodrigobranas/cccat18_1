@@ -1,4 +1,5 @@
 import { AccountRepositoryDatabase, AccountRepositoryMemory } from "../src/AccountRepository";
+import { Registry } from "../src/DI";
 import GetAccount from "../src/GetAccount";
 import SignUp from "../src/Signup";
 
@@ -7,9 +8,9 @@ let getAccount: GetAccount;
 
 beforeEach(() => {
   const accountRepository = new AccountRepositoryDatabase();
-  //const accountRepository = new AccountRepositoryMemory();
-  signup = new SignUp(accountRepository);
-  getAccount = new GetAccount(accountRepository);
+  Registry.getInstance().provide("accountRepository", accountRepository);
+  signup = new SignUp();
+  getAccount = new GetAccount();
 });
 
 test ("Deve criar a conta de um passageiro", async function () {
