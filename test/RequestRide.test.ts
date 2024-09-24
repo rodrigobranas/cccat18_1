@@ -7,6 +7,7 @@ import RequestRide from "../src/RequestRide";
 import Signup from "../src/Signup";
 import GetRide from "../src/GetRide";
 import { RideRepositoryDataBase } from "../src/RideRepository";
+import { PgPromiseAdapter } from "../src/DataBaseConnection";
 
 let signup: Signup;
 let getAccount: GetAccount;
@@ -14,10 +15,9 @@ let requestRide: RequestRide;
 let getRide: GetRide;
 
 beforeEach(() => {
-  const accountRepository = new AccountRepositoryDatabase();
-  const rideRepository = new RideRepositoryDataBase();
-  Registry.getInstance().provide("accountRepository", accountRepository);
-  Registry.getInstance().provide("rideRepository", rideRepository);
+  Registry.getInstance().provide("databaseConnection", new PgPromiseAdapter());
+  Registry.getInstance().provide("accountRepository", new AccountRepositoryDatabase());
+  Registry.getInstance().provide("rideRepository", new RideRepositoryDataBase());
   signup = new Signup();
   getAccount = new GetAccount();
   requestRide = new RequestRide();
@@ -70,4 +70,9 @@ test ("Não deve solicitar uma corrida se a conta não for de um passageiro", as
 		toLong: -48.522234807851476
   };
   expect(() => requestRide.execute(inputRequestRide)).rejects.toThrow(new Error("Account must be from a passenger"));
+});
+
+afterEach(async () => {
+  const connection =  Registry.getInstance().inject("databaseConnection");
+  await connection.close();
 });

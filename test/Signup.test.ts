@@ -1,4 +1,5 @@
 import { AccountRepositoryDatabase, AccountRepositoryMemory } from "../src/AccountRepository";
+import { PgPromiseAdapter } from "../src/DataBaseConnection";
 import { Registry } from "../src/DI";
 import GetAccount from "../src/GetAccount";
 import SignUp from "../src/Signup";
@@ -7,8 +8,8 @@ let signup: SignUp;
 let getAccount: GetAccount;
 
 beforeEach(() => {
-  const accountRepository = new AccountRepositoryDatabase();
-  Registry.getInstance().provide("accountRepository", accountRepository);
+  Registry.getInstance().provide("databaseConnection", new PgPromiseAdapter());
+  Registry.getInstance().provide("accountRepository", new AccountRepositoryDatabase());
   signup = new SignUp();
   getAccount = new GetAccount();
 });
@@ -91,4 +92,9 @@ test ("Não deve criar a conta de um motorista com placa inválida", async funct
     isDriver: true
   };
   await expect(() => signup.execute(input)).rejects.toThrow(new Error("Invalid Car Plate"));
+});
+
+afterEach(async () => {
+  const connection =  Registry.getInstance().inject("databaseConnection");
+  await connection.close();
 });
