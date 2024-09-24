@@ -7,6 +7,7 @@ import Password from "./Password";
 import UUID from "./UUID";
 
 // Design Pattern - Facade, expoe um interface mais simples, delegando a complexidade interna para outros responsáveis
+// Entity
 export default class Account {
   private accountId: UUID;
   private name: Name;

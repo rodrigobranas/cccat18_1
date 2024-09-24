@@ -1,3 +1,4 @@
+// Entity
 export default class Name {
   private value: string;
 

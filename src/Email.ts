@@ -1,3 +1,4 @@
+// Entity
 export default class Email {
   private value: string;
 

@@ -1,3 +1,4 @@
+// Entity
 export default class Cpf {
   
   CPF_VALID_LENGTH = 11;

@@ -1,3 +1,4 @@
+// Entity
 export default class CarPlate {
   private value: string;
 
