@@ -1,36 +1,29 @@
-import express from "express";
 import Signup from "./Signup";
 import { AccountRepositoryDatabase } from "./AccountRepository";
 import GetAccount from "./GetAccount";
 import { Registry } from "./DI";
+import { PgPromiseAdapter } from "./DataBaseConnection";
+import { ExpressAdapter } from "./HttpServer";
 
 
-const app = express();
-app.use(express.json());
+const httpServer = new ExpressAdapter();
 
-const accountRepository = new AccountRepositoryDatabase();
-
-Registry.getInstance().provide("accountRepository", accountRepository);
+Registry.getInstance().provide("databaseConnection", new PgPromiseAdapter());
+Registry.getInstance().provide("accountRepository", new AccountRepositoryDatabase());
 
 
-app.post("/signup", async function (req, res) {
-  const input = req.body;
-  try {
-    
+httpServer.register("post","/signup", async function (params: any, body: any) {
+  const input = body;
     const signup = new Signup();
     const output = await signup.execute(input);
-    res.json(output);
-  } catch (e: any) {
-    res.status(422).json({message: e.message})
-  }
+    return output;
 });
 
-app.get("/accounts/:accountId", async function (req, res){
-  const accountRepository = new AccountRepositoryDatabase();
+httpServer.register("get", "/accounts/:accountId", async function (params: any, body: any){
   const getAccount = new GetAccount();
-  const output = await getAccount.execute(req.params.accountId);
-  res.json(output);
+  const output = await getAccount.execute(params.accountId);
+  return output;
 });
 
 
-app.listen(3000);
+httpServer.listen(3000);
