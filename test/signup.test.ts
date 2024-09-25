@@ -37,7 +37,7 @@ test('Nao deve criar a conta de um passageiro com nome inválido', async functio
   const responseSignup = await axios.post('http://localhost:3000/signup', input);
   expect(responseSignup.status).toBe(422)
   const outputSignup = responseSignup.data;
-  expect(outputSignup.message).toBe(-3)
+  expect(outputSignup.message).toBe("Invalid name")
 });
 
 test('Nao deve criar a conta de um passageiro com email inválido', async function () {
@@ -51,7 +51,7 @@ test('Nao deve criar a conta de um passageiro com email inválido', async functi
   const responseSignup = await axios.post('http://localhost:3000/signup', input);
   expect(responseSignup.status).toBe(422)
   const outputSignup = responseSignup.data;
-  expect(outputSignup.message).toBe(-2)
+  expect(outputSignup.message).toBe("Invalid email")
 });
 
 test('Nao deve criar a conta de um passageiro com cpf inválido', async function () {
@@ -65,7 +65,7 @@ test('Nao deve criar a conta de um passageiro com cpf inválido', async function
   const responseSignup = await axios.post('http://localhost:3000/signup', input);
   expect(responseSignup.status).toBe(422)
   const outputSignup = responseSignup.data;
-  expect(outputSignup.message).toBe(-1)
+  expect(outputSignup.message).toBe("Invalid CPF")
 });
 
 test('Nao deve criar a conta de um passageiro duplicado', async function () {
@@ -80,7 +80,7 @@ test('Nao deve criar a conta de um passageiro duplicado', async function () {
   const responseSignup = await axios.post('http://localhost:3000/signup', input);
   expect(responseSignup.status).toBe(422);
   const outputSignup = responseSignup.data;
-  expect(outputSignup.message).toBe(-4)
+  expect(outputSignup.message).toBe("Duplicate account")
 });
 
 test('Nao deve criar a conta de um motorista com placa inválido', async function () {
@@ -95,5 +95,5 @@ test('Nao deve criar a conta de um motorista com placa inválido', async functio
   const responseSignup = await axios.post('http://localhost:3000/signup', input);
   expect(responseSignup.status).toBe(422)
   const outputSignup = responseSignup.data;
-  expect(outputSignup.message).toBe(-5)
+  expect(outputSignup.message).toBe("Invalid car plate")
 });

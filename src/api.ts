@@ -8,13 +8,12 @@ const app = express();
 app.use(express.json());
 
 app.post("/signup", async function (req, res) {
-	const input = req.body;
-  const output = await signup(input)
-
-  if(typeof output === "number") {
-    res.status(422).json({ message: output });
-  }else {
+  try {
+    const input = req.body;
+    const output = await signup(input)
     res.json(output)
+  } catch (error: any) {
+    res.status(422).json({ message: error.message });
   } 
 });
 
