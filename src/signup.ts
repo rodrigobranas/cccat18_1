@@ -67,4 +67,11 @@ app.post("/signup", async function (req, res) {
 	}
 });
 
+app.get("/accounts/:accountId", async function (req, res) {
+	const connection = pgp()("postgres://postgres:123456@localhost:5432/app");
+  const [accountData] = await connection.query("select * from ccca.account where account_id = $1", [req.params.accountId]);
+  await connection.$pool.end();
+  res.json(accountData);
+})
+
 app.listen(3000);
