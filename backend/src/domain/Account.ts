@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import CarPlate from "./CarPlate";
 import Cpf from "./Cpf";
 import Email from "./Email";

@@ -1,16 +1,16 @@
-import { AccountRepositoryDatabase, AccountRepositoryMemory } from "../src/AccountRepository";
-import { PgPromiseAdapter } from "../src/DataBaseConnection";
-import { Registry } from "../src/DI";
-import GetAccount from "../src/GetAccount";
-import SignUp from "../src/Signup";
+import { PgPromiseAdapter } from "../src/infra/database/DataBaseConnection";
+import { Registry } from "../src/infra/DI/DI";
+import { AccountRepositoryDatabase } from "../src/infra/Repository/AccountRepository";
+import Signup from "../src/application/usecases/Signup";
+import GetAccount from "../src/application/usecases/GetAccount";
 
-let signup: SignUp;
+let signup: Signup;
 let getAccount: GetAccount;
 
 beforeEach(() => {
   Registry.getInstance().provide("databaseConnection", new PgPromiseAdapter());
   Registry.getInstance().provide("accountRepository", new AccountRepositoryDatabase());
-  signup = new SignUp();
+  signup = new Signup();
   getAccount = new GetAccount();
 });
 

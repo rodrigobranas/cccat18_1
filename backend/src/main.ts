@@ -1,10 +1,10 @@
-import Signup from "./Signup";
-import { AccountRepositoryDatabase } from "./AccountRepository";
-import GetAccount from "./GetAccount";
-import { Registry } from "./DI";
-import { PgPromiseAdapter } from "./DataBaseConnection";
-import { ExpressAdapter } from "./HttpServer";
-import AccountController from "./AccountController";
+import { Registry } from "./infra/DI/DI";
+import { PgPromiseAdapter } from "./infra/database/DataBaseConnection";
+import { ExpressAdapter } from "./infra/http/HttpServer";
+import AccountController from "./infra/controller/AccountController";
+import { AccountRepositoryDatabase } from "./infra/Repository/AccountRepository";
+import Signup from "./application/usecases/Signup";
+import GetAccount from "./application/usecases/GetAccount";
 
 
 const httpServer = new ExpressAdapter();

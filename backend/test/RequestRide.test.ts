@@ -1,13 +1,13 @@
 // Use case driven development - começar pelo teste de integração
 
-import { AccountRepositoryDatabase, AccountRepositoryMemory } from "../src/AccountRepository";
-import { Registry } from "../src/DI";
-import GetAccount from "../src/GetAccount";
-import RequestRide from "../src/RequestRide";
-import Signup from "../src/Signup";
-import GetRide from "../src/GetRide";
-import { RideRepositoryDataBase } from "../src/RideRepository";
-import { PgPromiseAdapter } from "../src/DataBaseConnection";
+import GetAccount from "../src/application/usecases/GetAccount";
+import GetRide from "../src/application/usecases/GetRide";
+import RequestRide from "../src/application/usecases/RequestRide";
+import Signup from "../src/application/usecases/Signup";
+import { PgPromiseAdapter } from "../src/infra/database/DataBaseConnection";
+import { Registry } from "../src/infra/DI/DI";
+import { AccountRepositoryDatabase } from "../src/infra/Repository/AccountRepository";
+import { RideRepositoryDataBase } from "../src/infra/Repository/RideRepository";
 
 let signup: Signup;
 let getAccount: GetAccount;

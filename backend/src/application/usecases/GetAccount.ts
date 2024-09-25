@@ -1,5 +1,6 @@
-import AccountRepository from "./AccountRepository";
-import { inject } from "./DI";
+import { inject } from "../../infra/DI/DI";
+import AccountRepository from "../../infra/Repository/AccountRepository";
+
 
 /*
 * export default: diz para que exportat tudo, e não somente por quem deseja.

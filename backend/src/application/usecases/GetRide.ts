@@ -1,8 +1,6 @@
-import Account from "./Account";
-import AccountRepository from "./AccountRepository";
-import { inject, Registry } from "./DI";
-import Ride from "./Ride";
-import RideRepository from "./RideRepository";
+import { inject } from "../../infra/DI/DI";
+import RideRepository from "../../infra/Repository/RideRepository";
+
 
 //Use Case
 export default class GetRide {

@@ -1,6 +1,8 @@
-import Account from "./Account";
-import AccountRepository from "./AccountRepository";
-import { inject, Registry } from "./DI";
+import Account from "../../domain/Account";
+import { inject } from "../../infra/DI/DI";
+import AccountRepository from "../../infra/Repository/AccountRepository";
+
+
 
 //Use Case
 export default class Signup {

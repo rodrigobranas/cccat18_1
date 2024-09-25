@@ -1,7 +1,7 @@
-import AccountRepository from "./AccountRepository";
-import { inject } from "./DI";
-import Ride from "./Ride";
-import RideRepository from "./RideRepository";
+import { inject } from "../../infra/DI/DI";
+import AccountRepository from "../../infra/Repository/AccountRepository";
+import Ride from "../../domain/Ride"
+import RideRepository from "../../infra/Repository/RideRepository";
 
 //Use Case
 export default class RequestRide {
