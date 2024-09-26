@@ -2,15 +2,19 @@ import crypto from "crypto";
 import pgp from "pg-promise";
 import express from "express";
 import { validateCpf } from "./validateCpf";
-import { getAccount, signup } from "./signup";
+import Signup from "./Signup";
+import GetAccount from "./GetAccount";
+import { AccountDAODatabase } from "./AccountDAO";
 
 const app = express();
 app.use(express.json());
 
 app.post("/signup", async function (req, res) {
+  const input = req.body;
   try {
-    const input = req.body;
-    const output = await signup(input)
+    const accountDAODatabase = new AccountDAODatabase()
+    const signup = new Signup(accountDAODatabase);
+    const output = await signup.execute(input)
     res.json(output)
   } catch (error: any) {
     res.status(422).json({ message: error.message });
@@ -18,7 +22,9 @@ app.post("/signup", async function (req, res) {
 });
 
 app.get("/accounts/:accountId", async function (req, res) {
-	const accountData = await getAccount(req.params.accountId)
+  const accountDAODatabase = new AccountDAODatabase()
+  const getAccount = new GetAccount(accountDAODatabase);
+	const accountData = await getAccount.execute(req.params.accountId)
   res.json(accountData);
 })
 
