@@ -7,5 +7,4 @@ export default class GetAccount {
     const accountData = await this.accountDAO.getAccountById(accountId)
     return accountData;
   }
-  
 }

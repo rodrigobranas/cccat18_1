@@ -1,4 +1,4 @@
-import { AccountDAODatabase } from "../src/AccountDAO";
+import { AccountDAODatabase, AccountDAOMemory } from "../src/AccountDAO";
 import GetAccount from "../src/GetAccount";
 import Signup from "../src/Signup";
 
@@ -6,9 +6,10 @@ let signup: Signup
 let getAccount: GetAccount
 
 beforeEach(() => {
-  const accountDAODatabase = new AccountDAODatabase();
-  signup = new Signup(accountDAODatabase)
-  getAccount = new GetAccount(accountDAODatabase)
+  //const accountDAODatabase = new AccountDAODatabase();
+  const accountDAOMemory = new AccountDAOMemory();
+  signup = new Signup(accountDAOMemory)
+  getAccount = new GetAccount(accountDAOMemory)
 })
 
 test('Deve criar a conta de um passageiro', async function () {
@@ -21,13 +22,13 @@ test('Deve criar a conta de um passageiro', async function () {
   }
   const outputSignup = await signup.execute(input)
   expect(outputSignup.accountId).toBeDefined();
-
+  
   const outputGetAccount = await getAccount.execute(outputSignup.accountId)
   expect(outputGetAccount.name).toBe(input.name)
   expect(outputGetAccount.email).toBe(input.email)
   expect(outputGetAccount.cpf).toBe(input.cpf)
   expect(outputGetAccount.password).toBe(input.password)
-  expect(outputGetAccount.is_passenger).toBe(input.isPassenger)
+  expect(outputGetAccount.isPassenger).toBe(input.isPassenger)
 });
 
 test('Nao deve criar a conta de um passageiro com nome inválido', async function () {
