@@ -1,9 +1,10 @@
 import crypto from "crypto";
 import { validateCpf } from "./validateCpf";
 import AccountDAO from "./AccountDAO";
+import MailerGatewayMemory from "./MailerGatewayMemory";
 
 export default class Signup {
-  constructor (readonly accountDAO: AccountDAO) {}
+  constructor (readonly accountDAO: AccountDAO, readonly mailerGatewayMemory: MailerGatewayMemory) {}
 
   async execute (input: any) {
     input.accountId = crypto.randomUUID();
@@ -14,6 +15,7 @@ export default class Signup {
     if (!validateCpf(input.cpf)) throw new Error("Invalid CPF")
     if (input.isDriver && !input.carPlate.match(/[A-Z]{3}[0-9]{4}/)) throw new Error("Invalid car plate")
     await this.accountDAO.saveAccount(input)
+    this.mailerGatewayMemory.send(input.email)
     return { accountId: input.accountId };
   };
 }
