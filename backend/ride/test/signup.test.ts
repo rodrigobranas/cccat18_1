@@ -1,4 +1,4 @@
-import { AccountDAODatabase, AccountDAOMemory } from "../src/AccountDAO";
+import { AccountRepositoryDatabase, AccountRepositoryMemory } from "../src/AccountRepository";
 import GetAccount from "../src/GetAccount";
 import { MailerGatewayMemory } from "../src/MailerGateway";
 import Signup from "../src/Signup";
@@ -9,13 +9,10 @@ let getAccount: GetAccount;
 
 // Integration Narrow -> Broad
 beforeEach(() => {
-	const accountDAO = new AccountDAODatabase();
-	// fake
-	// const accountDAO = new AccountDAOMemory();
-	// fake
+	const accountRepository = new AccountRepositoryDatabase();
 	const mailerGateway = new MailerGatewayMemory();
-	signup = new Signup(accountDAO, mailerGateway);
-	getAccount = new GetAccount(accountDAO);
+	signup = new Signup(accountRepository, mailerGateway);
+	getAccount = new GetAccount(accountRepository);
 });
 
 test("Deve criar a conta de um passageiro", async function () {
@@ -33,7 +30,7 @@ test("Deve criar a conta de um passageiro", async function () {
 	expect(outputGetAccount.email).toBe(input.email);
 	expect(outputGetAccount.cpf).toBe(input.cpf);
 	expect(outputGetAccount.password).toBe(input.password);
-	// expect(outputGetAccount.isPassenger).toBe(input.isPassenger);
+	expect(outputGetAccount?.isPassenger).toBe(input.isPassenger);
 });
 
 test("Não deve criar a conta de um passageiro com nome inválido", async function () {
@@ -95,7 +92,7 @@ test("Não deve criar a conta de um motorista com placa inválida", async functi
 
 test("Deve criar a conta de um passageiro com stub", async function () {
 	const mailerStub = sinon.stub(MailerGatewayMemory.prototype, "send").resolves();
-	const getAccountByEmail = sinon.stub(AccountDAODatabase.prototype, "getAccountByEmail").resolves();
+	const getAccountByEmail = sinon.stub(AccountRepositoryDatabase.prototype, "getAccountByEmail").resolves();
 	const input = {
 		name: "John Doe",
 		email: `john.doe@gmail.com`,

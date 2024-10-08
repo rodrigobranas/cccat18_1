@@ -1,6 +1,6 @@
 import express from "express";
 import Signup from "./Signup";
-import { AccountDAODatabase } from "./AccountDAO";
+import { AccountRepositoryDatabase } from "./AccountRepository";
 import GetAccount from "./GetAccount";
 import cors from "cors";
 import { MailerGatewayMemory } from "./MailerGateway";
@@ -12,10 +12,11 @@ app.use(cors());
 app.post("/signup", async function (req, res) {
 	const input = req.body;
 	try {
-		const accountDAO = new AccountDAODatabase();
+		const accountRepository = new AccountRepositoryDatabase();
 		const mailerGateway = new MailerGatewayMemory();
-		const signup = new Signup(accountDAO, mailerGateway);
+		const signup = new Signup(accountRepository, mailerGateway);
 		const output = await signup.execute(input);
+		console.log(output)
 		res.json(output);
 	} catch (e: any) {
 		res.status(422).json({ message: e.message });
@@ -23,8 +24,8 @@ app.post("/signup", async function (req, res) {
 });
 
 app.get("/accounts/:accountId", async function (req, res) {
-	const accountDAO = new AccountDAODatabase();
-	const getAccount = new GetAccount(accountDAO);
+	const accountRepository = new AccountRepositoryDatabase();
+	const getAccount = new GetAccount(accountRepository);
 	const output = await getAccount.execute(req.params.accountId);
 	res.json(output);
 });
